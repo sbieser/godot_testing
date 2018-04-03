@@ -69,6 +69,12 @@ func change_state(new_state):
 			pass
 		STUNNED_IDLE:
 			velocity.x = 0
+		RUN:
+			new_anim = "run"
+			change_direction()
+		ROLL:
+			new_anim = "roll"
+			change_direction()
 	
 	if crouching == true:
 		$CollisionShape2D.shape.set_extents(Vector2(16,16))
@@ -80,12 +86,14 @@ func change_state(new_state):
 		$AnimatedSprite.position = Vector2(0,0)
 	
 	if facing == LEFT_FACING:
+		print("LEFT_FACING")
 		$AnimatedSprite.flip_h = true
 		if crouching:
 			get_node("AttackArea/CollisionShape2D").position = Vector2(-33,16)
 		else:
 			get_node("AttackArea/CollisionShape2D").position = Vector2(-33,-16)
 	else:
+		print("RIGHT_FACING")
 		$AnimatedSprite.flip_h = false
 		if crouching:
 			get_node("AttackArea/CollisionShape2D").position = Vector2(33,16)
@@ -119,7 +127,6 @@ func get_input():
 		change_state(JUMP)
 		velocity.y = jump_speed
 	
-	
 	var speed = walk_speed
 	if run:
 		speed = run_speed
@@ -135,7 +142,11 @@ func get_input():
 		else:
 			change_state(CROUCH)
 	elif velocity.x != 0:
-		change_state(WALK)
+		#change_state(WALK)
+		if run:
+			change_state(RUN)
+		else:
+			change_state(WALK)
 	elif state == WALK or state == CROUCH or state == CROUCH_WALK:
 		change_state(IDLE)
 	
@@ -176,12 +187,10 @@ func _physics_process(delta):
 				
 	velocity = move_and_slide(velocity, Vector2(0,-1))
 	
-		
 func _on_AttackTimer_timeout():
 	hit_bodies.clear()
 	get_node("AttackArea/AttackTimer").stop()
 	change_state(IDLE)
-
 
 func _on_StunTimer_timeout():
 	#pass # replace with function body
