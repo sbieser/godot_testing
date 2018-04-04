@@ -38,6 +38,7 @@ func change_direction():
 		facing = RIGHT_FACING
 
 func change_state(new_state):
+	print(str(new_state))
 	$AttackArea.visible = false
 	state = new_state
 	match state:
@@ -69,11 +70,13 @@ func change_state(new_state):
 			pass
 		STUNNED_IDLE:
 			velocity.x = 0
+			$StunIdleTimer.start()
 		RUN:
 			new_anim = "run"
 			change_direction()
 		ROLL:
 			new_anim = "roll"
+			$RollTimer.start()
 			change_direction()
 	
 	if crouching == true:
@@ -86,24 +89,65 @@ func change_state(new_state):
 		$AnimatedSprite.position = Vector2(0,0)
 	
 	if facing == LEFT_FACING:
-		print("LEFT_FACING")
 		$AnimatedSprite.flip_h = true
 		if crouching:
 			get_node("AttackArea/CollisionShape2D").position = Vector2(-33,16)
 		else:
 			get_node("AttackArea/CollisionShape2D").position = Vector2(-33,-16)
 	else:
-		print("RIGHT_FACING")
 		$AnimatedSprite.flip_h = false
 		if crouching:
 			get_node("AttackArea/CollisionShape2D").position = Vector2(33,16)
 		else:
 			get_node("AttackArea/CollisionShape2D").position = Vector2(33,-16)
 			
+
+func handle_input():
+	print(str(state))
+	#set velocity to 0 initially
+	velocity.x = 0
+	
+	#Left/Right - Move
+	#Up         - Look up / Climb
+	#Down       - Look down / Crouch / Climb / Run (If down-for-running is enabled)
+	#X          - Action
+	#Z          - Jump
+	#C          - Cycle held item, Bombs, Rope
+	#Shift      - Run
+	var right = Input.is_action_pressed("ui_right")
+	var left = Input.is_action_pressed("ui_left")
+	var up = Input.is_action_pressed("ui_up")
+	var down = Input.is_action_pressed("ui_down")
+	var x = Input.is_action_pressed("ui_x") # 
+	var z = Input.is_action_pressed("ui_z") # a button for run
+	var shift = Input.is_action_just_pressed("ui_shift")
+	
+	match state:
+		IDLE:
+			if right:
+				velocity.x += walk_speed
+				state = WALK
+				#change_state(WALK)
+			elif left:
+				velocity.x -= walk_speed
+				state = WALK
+				#change_state(WALK)
+			elif z:
+				state = JUMP 
+				velocity.y = jump_speed
+		WALK:
+			if right:
+				velocity.x += walk_speed
+			elif left:
+				velocity.x -= walk_speed
+			elif !right and !left:
+				state = IDLE
+				#change_state(IDLE)
+		JUMP:
+			pass
+			
+	
 func get_input():
-	
-	print(str(run_speed))
-	
 	if attacking || state == STUNNED || state == STUNNED_IDLE:
 		return
 	
@@ -142,49 +186,57 @@ func get_input():
 		else:
 			change_state(CROUCH)
 	elif velocity.x != 0:
-		#change_state(WALK)
-		if run:
-			change_state(RUN)
+		if run and is_on_floor():
+			if state != RUN and state != ROLL:
+				change_state(ROLL)
 		else:
 			change_state(WALK)
-	elif state == WALK or state == CROUCH or state == CROUCH_WALK:
+	elif state == WALK or state == CROUCH or state == CROUCH_WALK or state == RUN:
 		change_state(IDLE)
 	
 func _process(delta):
-	get_input()
+	#get_input()
+	handle_input()
 	if new_anim != anim:
 		anim = new_anim
 		$AnimatedSprite.play(anim)
 	
 func _physics_process(delta):
-	if attacking:
-		var bodies = $AttackArea.get_overlapping_bodies()
-		for body in bodies:
-			if body.is_in_group("enemies") and not hit_bodies.has(body):
-				hit_bodies.append(body)
-				body._takeDamage(5)
-	
 	velocity.y += gravity * delta
-	if state == JUMP: #|| state == STUNNED:
-		if is_on_floor():
-			change_state(IDLE)
 	
+	match state:
+		JUMP:
+			if is_on_floor():
+				state = IDLE
+	
+	#if attacking:
+	#	var bodies = $AttackArea.get_overlapping_bodies()
+	#	for body in bodies:
+	#		if body.is_in_group("enemies") and not hit_bodies.has(body):
+	#			hit_bodies.append(body)
+	#			body._takeDamage(5)
+	#
+	#velocity.y += gravity * delta
+	#if state == JUMP:
+	#	if is_on_floor():
+	#		change_state(IDLE)
+	#
 	#trigger the stun timer when the player has hit the floor
-	if state == STUNNED:
-		if is_on_floor():
-			change_state(STUNNED_IDLE)
-			$StunIdleTimer.start()
-		
-	var collision_count = get_slide_count()
-	if collision_count > 0:
-		for i in range(collision_count):
-			var collision = get_slide_collision(i)
-			if collision.collider.is_in_group("enemies"):
-				change_state(STUNNED)
-				print("we have been hit by: " + collision.collider.name)
-				velocity.y = jump_speed
-				velocity.x = -velocity.x
-				
+	#if state == STUNNED:
+	#	if is_on_floor():
+	#		change_state(STUNNED_IDLE)
+	#		#$StunIdleTimer.start()
+	#	
+	#var collision_count = get_slide_count()
+	#if collision_count > 0:
+	#	for i in range(collision_count):
+	#		var collision = get_slide_collision(i)
+	#		if collision.collider.is_in_group("enemies"):
+	#			change_state(STUNNED)
+	#			#print("we have been hit by: " + collision.collider.name)
+	#			velocity.y = jump_speed
+	#			velocity.x = -velocity.x
+	#			
 	velocity = move_and_slide(velocity, Vector2(0,-1))
 	
 func _on_AttackTimer_timeout():
@@ -196,3 +248,9 @@ func _on_StunTimer_timeout():
 	#pass # replace with function body
 	$StunIdleTimer.stop()
 	change_state(IDLE)
+
+func _on_RollTimer_timeout():
+	#pass # replace with function body
+	print("_on_RollTimer_timeout")
+	$RollTimer.stop()
+	change_state(RUN)

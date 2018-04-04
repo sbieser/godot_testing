@@ -1,16 +1,16 @@
 [gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://Player.gd" type="Script" id=1]
-[ext_resource path="res://textures/player_anims/player_crouch_walk_1.jpg" type="Texture" id=2]
-[ext_resource path="res://textures/player_anims/player_crouch_walk_2.jpg" type="Texture" id=3]
-[ext_resource path="res://textures/player_anims/player_attack.jpg" type="Texture" id=4]
-[ext_resource path="res://textures/player_anims/player_crouch_attack.jpg" type="Texture" id=5]
-[ext_resource path="res://textures/player_anims/player_walk_2.jpg" type="Texture" id=6]
-[ext_resource path="res://textures/player_anims/player_walk_3.jpg" type="Texture" id=7]
-[ext_resource path="res://textures/player_anims/player_crouch.jpg" type="Texture" id=8]
+[ext_resource path="res://textures/player_anims/player_idle.jpg" type="Texture" id=2]
+[ext_resource path="res://textures/player_anims/player_crouch_walk_1.jpg" type="Texture" id=3]
+[ext_resource path="res://textures/player_anims/player_crouch_walk_2.jpg" type="Texture" id=4]
+[ext_resource path="res://textures/player_anims/player_walk_2.jpg" type="Texture" id=5]
+[ext_resource path="res://textures/player_anims/player_walk_3.jpg" type="Texture" id=6]
+[ext_resource path="res://textures/player_anims/player_roll.jpg" type="Texture" id=7]
+[ext_resource path="res://textures/player_anims/player_crouch_attack.jpg" type="Texture" id=8]
 [ext_resource path="res://textures/player_anims/player_run.jpg" type="Texture" id=9]
-[ext_resource path="res://textures/player_anims/player_idle.jpg" type="Texture" id=10]
-[ext_resource path="res://textures/player_anims/player_roll.jpg" type="Texture" id=11]
+[ext_resource path="res://textures/player_anims/player_crouch.jpg" type="Texture" id=10]
+[ext_resource path="res://textures/player_anims/player_attack.jpg" type="Texture" id=11]
 
 [sub_resource type="RectangleShape2D" id=1]
 
@@ -20,29 +20,29 @@ extents = Vector2( 16.5328, 15.9143 )
 [sub_resource type="SpriteFrames" id=2]
 
 animations = [ {
-"frames": [ ExtResource( 2 ), ExtResource( 3 ) ],
+"frames": [ ExtResource( 2 ) ],
+"loop": false,
+"name": "idle",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 3 ), ExtResource( 4 ) ],
 "loop": true,
 "name": "crouch_walk",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 4 ) ],
-"loop": true,
-"name": "attack",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 5 ) ],
-"loop": true,
-"name": "crouch_attack",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 6 ), ExtResource( 7 ) ],
+"frames": [ ExtResource( 5 ), ExtResource( 6 ) ],
 "loop": true,
 "name": "walk",
 "speed": 10.0
 }, {
+"frames": [ ExtResource( 7 ) ],
+"loop": true,
+"name": "roll",
+"speed": 5.0
+}, {
 "frames": [ ExtResource( 8 ) ],
 "loop": true,
-"name": "crouch",
+"name": "crouch_attack",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 9 ) ],
@@ -51,13 +51,13 @@ animations = [ {
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 10 ) ],
-"loop": false,
-"name": "idle",
+"loop": true,
+"name": "crouch",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 11 ) ],
 "loop": true,
-"name": "roll",
+"name": "attack",
 "speed": 5.0
 } ]
 
@@ -123,8 +123,17 @@ wait_time = 0.7
 one_shot = true
 autostart = false
 
+[node name="RollTimer" type="Timer" parent="." index="4"]
+
+process_mode = 1
+wait_time = 1.0
+one_shot = true
+autostart = false
+
 [connection signal="timeout" from="AttackArea/AttackTimer" to="." method="_on_AttackTimer_timeout"]
 
 [connection signal="timeout" from="StunIdleTimer" to="." method="_on_StunTimer_timeout"]
+
+[connection signal="timeout" from="RollTimer" to="." method="_on_RollTimer_timeout"]
 
 

@@ -28,8 +28,7 @@ func change_state(new_state):
 #this thing runs by itself!
 
 func _process(delta):
-	print(str(health))
-#	# Called every frame. Delta is time since last frame.
+	# Called every frame. Delta is time since last frame.
 #	# Update game logic here.
 	# we probably only want to initiate a jump if the enemy is_on_floor() == true
 	pass
