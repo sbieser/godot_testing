@@ -23,6 +23,10 @@ var new_anim
 
 var hit_bodies = [] #array of bodies bit by the current attack
 
+
+#new better variables?
+var prev_velocity
+
 func _ready():
 	# Called every time the node is added to the scene.
 	# Initialization here
@@ -103,7 +107,7 @@ func change_state(new_state):
 			
 
 func handle_input():
-	print(str(state))
+	#print(str(state))
 	#set velocity to 0 initially
 	velocity.x = 0
 	
@@ -127,10 +131,12 @@ func handle_input():
 			if right:
 				velocity.x += walk_speed
 				state = WALK
+				change_direction()
 				#change_state(WALK)
 			elif left:
 				velocity.x -= walk_speed
 				state = WALK
+				change_direction()
 				#change_state(WALK)
 			elif z:
 				state = JUMP 
@@ -142,10 +148,31 @@ func handle_input():
 				velocity.x -= walk_speed
 			elif !right and !left:
 				state = IDLE
-				#change_state(IDLE)
 		JUMP:
-			pass
-			
+			match facing:
+				RIGHT_FACING:
+					if right:
+						velocity.x += walk_speed
+					elif left:
+						velocity.x = prev_velocity.x - 10
+						if velocity.x < 0:
+							velocity.x = 0
+				LEFT_FACING:
+					if right:
+						velocity.x = prev_velocity.x + 10
+						if velocity.x > 0:
+							velocity.x = 0
+					elif left:
+						velocity.x -= walk_speed
+	if velocity.x != 0:
+		prev_velocity = velocity
+		
+	print(str(velocity.x))
+	#change_direction()
+	#if facing == LEFT_FACING:
+	#	print("facing left")
+	#lif facing == RIGHT_FACING:
+	#	print("facing right")
 	
 func get_input():
 	if attacking || state == STUNNED || state == STUNNED_IDLE:

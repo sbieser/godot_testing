@@ -6,11 +6,11 @@
 [ext_resource path="res://textures/player_anims/player_crouch_walk_2.jpg" type="Texture" id=4]
 [ext_resource path="res://textures/player_anims/player_walk_2.jpg" type="Texture" id=5]
 [ext_resource path="res://textures/player_anims/player_walk_3.jpg" type="Texture" id=6]
-[ext_resource path="res://textures/player_anims/player_roll.jpg" type="Texture" id=7]
-[ext_resource path="res://textures/player_anims/player_crouch_attack.jpg" type="Texture" id=8]
+[ext_resource path="res://textures/player_anims/player_attack.jpg" type="Texture" id=7]
+[ext_resource path="res://textures/player_anims/player_crouch.jpg" type="Texture" id=8]
 [ext_resource path="res://textures/player_anims/player_run.jpg" type="Texture" id=9]
-[ext_resource path="res://textures/player_anims/player_crouch.jpg" type="Texture" id=10]
-[ext_resource path="res://textures/player_anims/player_attack.jpg" type="Texture" id=11]
+[ext_resource path="res://textures/player_anims/player_roll.jpg" type="Texture" id=10]
+[ext_resource path="res://textures/player_anims/player_crouch_attack.jpg" type="Texture" id=11]
 
 [sub_resource type="RectangleShape2D" id=1]
 
@@ -37,12 +37,12 @@ animations = [ {
 }, {
 "frames": [ ExtResource( 7 ) ],
 "loop": true,
-"name": "roll",
+"name": "attack",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 8 ) ],
 "loop": true,
-"name": "crouch_attack",
+"name": "crouch",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 9 ) ],
@@ -52,12 +52,12 @@ animations = [ {
 }, {
 "frames": [ ExtResource( 10 ) ],
 "loop": true,
-"name": "crouch",
+"name": "roll",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 11 ) ],
 "loop": true,
-"name": "attack",
+"name": "crouch_attack",
 "speed": 5.0
 } ]
 
@@ -75,7 +75,7 @@ collision_mask = 1
 collision/safe_margin = 0.08
 script = ExtResource( 1 )
 _sections_unfolded = [ "Transform", "Visibility" ]
-jump_speed = -200
+jump_speed = -300
 gravity = 500
 run_speed = 165
 walk_speed = 100
