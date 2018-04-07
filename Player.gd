@@ -26,6 +26,7 @@ var hit_bodies = [] #array of bodies bit by the current attack
 
 #new better variables?
 #var prev_velocity #not working very well, will have to come back to this
+var cur_speed
 
 func _ready():
 	# Called every time the node is added to the scene.
@@ -106,6 +107,9 @@ func change_state(new_state):
 			get_node("AttackArea/CollisionShape2D").position = Vector2(33,-16)
 			
 
+
+
+
 func handle_input():
 	print(str(state))
 	#set velocity to 0 initially
@@ -124,17 +128,17 @@ func handle_input():
 	var down = Input.is_action_pressed("ui_down")
 	var x = Input.is_action_pressed("ui_x") # 
 	var z = Input.is_action_pressed("ui_z") # a button for run
-	var shift = Input.is_action_just_pressed("ui_shift")
+	var shift = Input.is_action_pressed("ui_shift")
 	
 	match state:
 		IDLE:
 			if right:
-				velocity.x += walk_speed
+				velocity.x += cur_speed
 				state = WALK
 				#change_direction()
 				#change_state(WALK)
 			if left:
-				velocity.x -= walk_speed
+				velocity.x -= cur_speed
 				state = WALK
 				#change_direction()
 				#change_state(WALK)
@@ -142,58 +146,37 @@ func handle_input():
 				state = JUMP 
 				velocity.y = jump_speed
 		WALK:
-			#if shift:
-			#	state = RUN
-			#	continue
+			if shift:
+				state = RUN
+				#continue
 			if right:
-				velocity.x += walk_speed
+				velocity.x += cur_speed
 			if left:
-				velocity.x -= walk_speed
+				velocity.x -= cur_speed
 			if z:
 				state = JUMP
 				velocity.y = jump_speed
 			if velocity.x == 0:
-				print("here")
 				state = IDLE
 		JUMP:
 			if right:
-				velocity.x += walk_speed
+				velocity.x += cur_speed
 			elif left:
-				velocity.x -= walk_speed
-			#match facing:
-			#	RIGHT_FACING:
-			#		if right:
-			#			velocity.x += walk_speed
-			#		elif left:
-			#			velocity.x = prev_velocity.x - 10
-			#			if velocity.x < 0:
-			#				velocity.x = 0
-			#	LEFT_FACING:
-			#		if right:
-			#			velocity.x = prev_velocity.x + 10
-			#			if velocity.x > 0:
-			#				velocity.x = 0
-			#		elif left:
-			#			velocity.x -= walk_speed
+				velocity.x -= cur_speed
 		RUN:
 			if right:
-				velocity.x += (2 * walk_speed)
+				velocity.x += cur_speed
 			if left:
-				velocity.x -= (2 * walk_speed)
+				velocity.x -= cur_speed
 			if !shift:
+				#state = WALK
 				if velocity.x != 0:
 					state = WALK
 				else:
 					state = IDLE
-	#if velocity.x != 0:
-	#	prev_velocity = velocity
-		
-	#print(str(velocity.x))
-	#change_direction()
-	#if facing == LEFT_FACING:
-	#	print("facing left")
-	#lif facing == RIGHT_FACING:
-	#	print("facing right")
+			if z:
+				state = JUMP
+				velocity.y = jump_speed
 	
 func get_input():
 	if attacking || state == STUNNED || state == STUNNED_IDLE:
@@ -242,8 +225,17 @@ func get_input():
 	elif state == WALK or state == CROUCH or state == CROUCH_WALK or state == RUN:
 		change_state(IDLE)
 	
+func handle_speed():
+	var shift = Input.is_action_pressed("ui_shift")
+	
+	if shift:
+		cur_speed = run_speed
+	else:
+		cur_speed = walk_speed
+	
 func _process(delta):
 	#get_input()
+	handle_speed()
 	handle_input()
 	if new_anim != anim:
 		anim = new_anim
