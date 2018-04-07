@@ -5,7 +5,7 @@
 [ext_resource path="res://Level1_test.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Enemy.tscn" type="PackedScene" id=4]
 
-[node name="Main" type="Node"]
+[node name="Main" type="Node" index="0"]
 
 script = ExtResource( 1 )
 
